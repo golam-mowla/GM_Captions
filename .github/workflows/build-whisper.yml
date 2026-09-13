@@ -1,0 +1,50 @@
+# Rename this file to .github/workflows/build-whisper.yml when you push to
+# GitHub (per your GitHub Actions hidden-folder gotcha, create .github/workflows/
+# manually via the GitHub web UI's "Create new file" button, then paste this in -
+# drag-and-drop silently skips the dot-folder).
+
+name: Build whisper.cpp for Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout whisper.cpp
+        uses: actions/checkout@v4
+        with:
+          repository: ggerganov/whisper.cpp
+          path: whisper.cpp
+
+      - name: Configure CMake
+        run: cmake -B whisper.cpp/build -S whisper.cpp -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build whisper.cpp/build --config Release -j
+
+      - name: Download quantized large-v3 model
+        run: |
+          curl -L -o whisper.cpp/models/ggml-large-v3-q5_k.bin `
+            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q5_0.bin
+
+      - name: Download base.en and tiny.en (lighter fallbacks)
+        run: |
+          curl -L -o whisper.cpp/models/ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
+          curl -L -o whisper.cpp/models/ggml-tiny.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin
+
+      - name: Package artifacts
+        run: |
+          mkdir dist
+          copy whisper.cpp\build\bin\Release\whisper-cli.exe dist\
+          mkdir dist\models
+          copy whisper.cpp\models\ggml-large-v3-q5_k.bin dist\models\
+          copy whisper.cpp\models\ggml-base.en.bin dist\models\
+          copy whisper.cpp\models\ggml-tiny.en.bin dist\models\
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gm-captions-host-bin
+          path: dist
