@@ -37,7 +37,8 @@ jobs:
       - name: Package artifacts
         run: |
           mkdir dist
-          copy whisper.cpp\build\bin\Release\whisper-cli.exe dist\
+          xcopy /E /I /Y whisper.cpp\build\bin\Release\*.exe dist\ 
+          xcopy /E /I /Y whisper.cpp\build\bin\Release\*.dll dist\
           mkdir dist\models
           copy whisper.cpp\models\ggml-large-v3-q5_k.bin dist\models\
           copy whisper.cpp\models\ggml-base.en.bin dist\models\
