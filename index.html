@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GM Captions</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="panel">
+    <h1>GM Captions <span class="build">build 1</span></h1>
+
+    <!-- MODE TOGGLE -->
+    <div class="section">
+      <label>Transcription mode</label>
+      <div class="toggle-row">
+        <button id="modeLocal" class="toggle active">Local (offline)</button>
+        <button id="modeCloud" class="toggle">Cloud (Colab/Kaggle)</button>
+      </div>
+    </div>
+
+    <!-- LOCAL MODE OPTIONS -->
+    <div id="localOptions" class="section">
+      <label>Whisper model</label>
+      <select id="modelSelect">
+        <option value="tiny.en">tiny.en (~75MB, fastest, rough)</option>
+        <option value="base.en">base.en (~140MB, fast, decent)</option>
+        <option value="small.en">small.en (~460MB, slower, good)</option>
+        <option value="medium.en">medium.en (~1.5GB, slow, very good)</option>
+        <option value="large-v3-q5" selected>large-v3 quantized (~1GB, slowest, best)</option>
+      </select>
+      <p class="hint" id="modelHint">large-v3 on CPU: expect ~2–5x clip length to transcribe. Longer clips = longer wait.</p>
+    </div>
+
+    <!-- CLOUD MODE OPTIONS -->
+    <div id="cloudOptions" class="section hidden">
+      <label>Colab / Kaggle notebook URL</label>
+      <input type="text" id="notebookUrl" placeholder="https://colab.research.google.com/...">
+      <div class="btn-row">
+        <button id="exportForCloud" class="btn-secondary">1. Export audio for upload</button>
+        <button id="openNotebook" class="btn-secondary">2. Open notebook</button>
+      </div>
+      <label>3. After you download the .srt, select it:</label>
+      <div class="btn-row">
+        <button id="pickSrt" class="btn-secondary">Choose .srt file</button>
+        <span id="srtPicked" class="hint">No file selected</span>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- CAPTIONING PREFERENCES (matches native Premiere dialog) -->
+    <div class="section">
+      <label class="section-title">Captioning Preferences</label>
+
+      <label>Format</label>
+      <select id="formatSelect">
+        <option value="subtitle">Subtitle</option>
+        <option value="caption">Caption</option>
+        <option value="srt">SRT (export only, no track)</option>
+      </select>
+
+      <label>Lines</label>
+      <div class="radio-row">
+        <label><input type="radio" name="lines" value="single"> Single</label>
+        <label><input type="radio" name="lines" value="double" checked> Double</label>
+      </div>
+
+      <label>Maximum length in characters</label>
+      <div class="slider-row">
+        <input type="range" id="maxCharsSlider" min="10" max="80" value="42">
+        <input type="number" id="maxCharsBox" min="10" max="80" value="42"> <span>characters</span>
+      </div>
+
+      <label>Minimum duration in seconds</label>
+      <div class="slider-row">
+        <input type="range" id="minDurSlider" min="0.5" max="10" step="0.1" value="3.0">
+        <input type="number" id="minDurBox" min="0.5" max="10" step="0.1" value="3.0"> <span>seconds</span>
+      </div>
+
+      <label>Gap between captions (frames)</label>
+      <div class="slider-row">
+        <input type="range" id="gapSlider" min="0" max="30" value="0">
+        <input type="number" id="gapBox" min="0" max="30" value="0"> <span>frames</span>
+      </div>
+    </div>
+
+    <!-- STATUS / PROGRESS -->
+    <div id="statusBox" class="status hidden">
+      <div class="status-text" id="statusText">Idle</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="footer">
+      <button id="cancelBtn" class="btn-secondary">Cancel</button>
+      <button id="createBtn" class="btn-primary">Create Captions</button>
+    </div>
+  </div>
+
+  <script src="js/CSInterface.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
