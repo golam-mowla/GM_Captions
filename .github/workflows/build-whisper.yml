@@ -34,10 +34,18 @@ jobs:
           curl -L -o whisper.cpp/models/ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin
           curl -L -o whisper.cpp/models/ggml-tiny.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin
 
+      - name: Download ffmpeg (static, for direct audio extraction)
+        run: |
+          curl -L -o ffmpeg.zip https://github.com/BtbN/FFmpeg-Builds/releases/latest/download/ffmpeg-master-latest-win64-gpl.zip
+          powershell -Command "Expand-Archive -Path ffmpeg.zip -DestinationPath ffmpeg_extracted"
+          $exe = Get-ChildItem -Path ffmpeg_extracted -Filter ffmpeg.exe -Recurse | Select-Object -First 1
+          Copy-Item $exe.FullName -Destination whisper.cpp\build\bin\Release\ffmpeg.exe
+        shell: pwsh
+
       - name: Package artifacts
         run: |
           mkdir dist
-          xcopy /E /I /Y whisper.cpp\build\bin\Release\*.exe dist\ 
+          xcopy /E /I /Y whisper.cpp\build\bin\Release\*.exe dist\
           xcopy /E /I /Y whisper.cpp\build\bin\Release\*.dll dist\
           mkdir dist\models
           copy whisper.cpp\models\ggml-large-v3-q5_k.bin dist\models\
